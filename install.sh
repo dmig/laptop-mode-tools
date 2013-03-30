@@ -117,6 +117,7 @@ $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/nolm-ac-stop"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/laptop-mode-tools/module-helpers"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d"
+$INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/conf.d/board-specific"
 $INSTALL -d -m 755 "$DESTDIR/etc/laptop-mode/modules"
 $INSTALL -d -m 755 "$DESTDIR/usr/share/polkit-1/actions"
 $INSTALL -d -m 755 "$DESTDIR/usr/sbin"
@@ -240,6 +241,17 @@ if [ "${SYSTEMD}" = "yes" ]; then
 	if ( ! $INSTALL -D -m 644 etc/systemd/laptop-mode.conf.tmpfiles "$DESTDIR/${TMPFILES_D}/laptop-mode.conf" ) ; then
 		echo "$0: Failed to install systemd tmpfiles into ${TMPFILES_D} Installation failed."
 	fi
+fi
+
+# udev rule
+if ( ! $INSTALL -D -m 644 etc/rules/99-laptop-mode.rules "$DESTDIR/etc/udev/rules.d/99-laptop-mode.rules" ) ; then
+    echo "$0: Failed to install udev rule into /etc/udev/rules.d/ Installation failed."
+    exit 23
+fi
+
+# udev helper tool
+if ( ! $INSTALL -D -m 755 etc/rules/lmt-udev "$DESTDIR/lib/udev/lmt-udev" ) ; then
+	echo "$0: Failed to install udev helper tool into /lib/udev/ Installation failed."
 fi
 
 ACPI_DONE=0
