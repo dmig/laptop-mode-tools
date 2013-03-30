@@ -658,6 +658,7 @@ lmt_load_config ()
 	fi
 }
 
+
 checkBattery ()
 {
 	# Weird way of checking that /sys/class/power_supply is not empty -- but it works.
