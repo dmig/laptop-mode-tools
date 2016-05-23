@@ -1,17 +1,21 @@
 [Unit]
 Description=Laptop Mode Tools
 Documentation=man:laptop_mode(8) man:laptop-mode.conf(8)
-Documentation=http://samwel.tk/laptop_mode
+Documentation=http://github.com/rickysarraf/laptop-mode-tools
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=@/usr/sbin/laptop_mode init auto
-ExecStop=@/usr/sbin/laptop_mode init stop
-ExecStopPost=@/bin/rm -f /var/run/laptop-mode-tools/enabled
-ExecReload=@/usr/sbin/laptop_mode auto
+ExecStartPre=/bin/rm -f /var/run/laptop-mode-tools/enabled
+ExecStartPre=/bin/rm -f /var/run/laptop-mode-tools/state
+ExecStart=/usr/sbin/laptop_mode init auto
+ExecStop=/usr/sbin/laptop_mode init stop
+ExecStopPost=/bin/rm -f /var/run/laptop-mode-tools/enabled
+ExecStopPost=/bin/rm -f /var/run/laptop-mode-tools/state
+ExecReload=/usr/sbin/laptop_mode auto
 StandardOutput=journal
 StandardError=journal
+TasksMax=infinity
 
 [Install]
 WantedBy=multi-user.target

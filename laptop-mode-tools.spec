@@ -3,11 +3,11 @@
 
 Summary: Tools for power savings based on battery/AC status
 Name: laptop-mode-tools
-Version: 1.68.1
+Version: 1.69.2
 Release: 1
 License: GPL
 Group: System Environment/Base
-URL: http://www.samwel.tk/laptop_mode
+URL: http://github.com/rickysarraf/laptop-mode-tools
 Vendor: Laptop Mode Tools Developers
 Distribution: RPM Based distributions
 Packager: Ritesh Raj Sarraf <rrs@researchut.com>
@@ -85,6 +85,7 @@ fi
 %{_sbindir}/*
 %{_usr}/share/laptop-mode-tools/modules/*
 %{_usr}/share/laptop-mode-tools/module-helpers/*
+%{_usr}/share/polkit-1/actions/org.linux.lmt.gui.policy
 %{_usr}/lib/pm-utils/sleep.d/*
 %{_usr}/lib/tmpfiles.d/laptop-mode.conf
 
@@ -101,6 +102,15 @@ fi
 
 
 %changelog
+* Sun Mar 27 2016 Ritesh Raj Sarraf <rrs@researchut.com> - 1.69.2-1
+- Updated to release 1.69.2
+
+* Tue Mar 15 2016 Ritesh Raj Sarraf <rrs@researchut.com> - 1.69.1-1
+- Updated to release 1.69.1
+
+* Mon Mar  7 2016 Ritesh Raj Sarraf <rrs@researchut.com> - 1.69-1
+- Updated to release 1.69
+
 * Sun Sep 27 2015 Ritesh Raj Sarraf <rrs@researchut.com> - 1.68.1-1
 - Updated to release 1.68.1
 
