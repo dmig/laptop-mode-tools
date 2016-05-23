@@ -34,7 +34,7 @@ findWifiIfs () {
 				EXCLUDED=0
 				for EXCLUDED_DRIVER in $WIRELESS_POWER_SAVING_EXCLUDE_DRIVERS ; do
 					if [ "$EXCLUDED_DRIVER" = "$DRIVER" ] ; then
-						log "VERBOSE" "Wireless interface $IFNAME excluded for wireless-power by driver name."
+						log "VERBOSE" "Wireless interface $IFNAME excluded for wireless-iw-power by driver name."
 						EXCLUDED=1
 					fi
 				done
