@@ -183,6 +183,18 @@ if ( ! $INSTALL -m 755 usr/share/laptop-mode-tools/modules/* "$DESTDIR/usr/share
 	exit 26
 fi
 
+if [ -f "$DESTDIR/etc/laptop-mode/modules/core" ] ; then
+	if ( ! rm "$DESTDIR/etc/laptop-mode/modules/core" ) ; then
+		echo "$0: Failed to install modules into /etc/laptop-mode/modules. Installation failed."
+		exit 35
+	fi
+fi		
+
+if ( ! $INSTALL -m 755 etc/laptop-mode/modules/* "$DESTDIR/etc/laptop-mode/modules" ) ; then
+	echo "$0: Failed to install modules into /etc/laptop-mode/modules. Installation failed."
+	exit 26
+fi
+
 if ( ! $INSTALL -m 755 usr/share/laptop-mode-tools/module-helpers/* "$DESTDIR/usr/share/laptop-mode-tools/module-helpers" ) ; then
 	echo "$0: Failed to install module helpers into /usr/share/laptop-mode-tools/module-helpers. Installation failed."
 	exit 37
