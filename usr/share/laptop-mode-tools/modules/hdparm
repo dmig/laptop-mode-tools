@@ -12,6 +12,11 @@
 #
 # $1 = drive name
 # $2 = capability (SDPARM/HDPARM or IDLE_TIMEOUT/POWERMGMT/WRITECACHE)
+
+
+UDEVADM=`which udevadm 2>/dev/null`;
+UDEVINFO=`which udevinfo 2>/dev/null`;
+
 is_capable() {
 	local dev=${1#/dev/}
 	local MEDIA=
@@ -41,7 +46,7 @@ is_capable() {
 	# It assumes more or less recent udev (> 070)
 	if [ $HAVE_UDEVINFO -ne 0 ] ; then
 		log "VERBOSE" "Querying $1 media type using udevinfo: "
-		if [ -x "$(which udevadm 2> /dev/null)" ]; then
+		if [ -x "$UDEVADM" ]; then
 			eval "$(udevadm info -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"
 		else
 			eval "$(udevinfo -q env -n $1 | egrep '(ID_TYPE=|ID_BUS=)' )"
@@ -152,8 +157,9 @@ fi
 if [ -x "$(which sdparm 2> /dev/null)" ]; then
 	SDPARM_AVAILABLE=1
 fi
+
 HAVE_UDEVINFO=0
-if [ -x "$(which udevadm 2> /dev/null)" ]; then
+if [ -x "$UDEVADM" ]; then
 	UDEVVERSION=$(udevadm info -V)
 	UDEV_VER_VERIFY=$(echo $UDEVVERSION | cut -b 1)
 	case $UDEV_VER_VERIFY in
@@ -172,7 +178,7 @@ else
 	# Older versions of udev (udevinfo) give output in the form of
 	# "udevinfo, version 125"
 	# Will be removed later. Currently only for backward compatibility
-	if [ -x "$(which udevinfo 2> /dev/null)" ] ; then
+	if [ -x "$UDEVINFO" ] ; then
 		UDEVVERSION=$(udevinfo -V | awk '{ print $3; }')
 		if [ "$UDEVVERSION" -gt 70 ] ; then
 			HAVE_UDEVINFO=1
@@ -232,20 +238,20 @@ if [ x$CONTROL_HD_IDLE_TIMEOUT = x1 ] ; then
 	log "VERBOSE" "(hdparm configuration value = $HD_IDLE_TIMEOUT.)"
 	for THISHD in $HD ; do
 		if is_capable $THISHD IDLE_TIMEOUT ; then
-			if is_capable $THISHD HDPARM ; then
-				if [ "$HDPARM_AVAILABLE" = "1" ]; then
-					log "VERBOSE" "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD"
-					log "VERBOSE" "`hdparm -S $HD_IDLE_TIMEOUT $THISHD 2>&1`"
-				else
-					log "VERBOSE" "ERROR: hdparm not installed."
-				fi
-			elif is_capable $THISHD SDPARM ; then
+			if is_capable $THISHD SDPARM ; then
 				if [ "$SDPARM_AVAILABLE" = "1" ]; then
 					HD_IDLE_TIMEOUT_DECISECONDS=$(($HD_IDLE_TIMEOUT_SECONDS*10))
 					log "VERBOSE" "Executing: sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD"
 					log "VERBOSE" "`sdparm -q -s SCT=$HD_IDLE_TIMEOUT_DECISECONDS $THISHD 2>&1`"
 				else
 					log "ERR" "ERROR: sdparm not installed."
+				fi
+			elif is_capable $THISHD HDPARM ; then
+				if [ "$HDPARM_AVAILABLE" = "1" ]; then
+					log "VERBOSE" "Executing: hdparm -S $HD_IDLE_TIMEOUT $THISHD"
+					log "VERBOSE" "`hdparm -S $HD_IDLE_TIMEOUT $THISHD 2>&1`"
+				else
+					log "VERBOSE" "ERROR: hdparm not installed."
 				fi
 			else
 				log "VERBOSE" "Skipping $THISHD: drive supports neither hdparm nor sdparm."
@@ -276,7 +282,14 @@ if [ x$CONTROL_HD_WRITECACHE = x1 ] ; then
 	log "VERBOSE" "Setting write cache on drives to $HD_WRITECACHE."
 	for THISHD in $HD ; do
 		if is_capable $THISHD WRITECACHE ; then
-			if is_capable $THISHD HDPARM ; then
+			if is_capable $THISHD SDPARM ; then
+				if [ "$SDPARM_AVAILABLE" = "1" ]; then
+					log "VERBOSE" "Executing: sdparm Write Cache $HD_WRITECACHE $THISHD"
+					log "VERBOSE" "`sdparm --set WCE=$HD_WRITECACHE $THISHD 2>&1`"
+				else
+					log "ERR" "ERROR: sdparm not installed."
+				fi
+			elif is_capable $THISHD HDPARM ; then
 				if [ "$HDPARM_AVAILABLE" = "1" ]; then
 					log "VERBOSE" "Executing: hdparm -W $HD_WRITECACHE $THISHD"
 					log "VERBOSE" "`hdparm -W $HD_WRITECACHE $THISHD 2>&1`"
